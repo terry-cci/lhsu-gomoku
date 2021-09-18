@@ -1,10 +1,10 @@
 <script lang="ts">
 const markers = [
-  [4, 4],
-  [4, 12],
-  [8, 8],
-  [12, 4],
-  [12, 12],
+  [3, 3],
+  [3, 11],
+  [7, 7],
+  [11, 3],
+  [11, 11],
 ];
 </script>
 
@@ -36,21 +36,20 @@ const hasMarker = computed(
       cursor-pointer
       group
       transition
-      duration-75
     "
     @click="emit('placechess')"
   >
     <svg class="w-full h-full cell-line stroke-current absolute">
       <line
         x1="50%"
-        :y1="info.pos.y > 1 ? '0%' : '50%'"
+        :y1="info.pos.y > 0 ? '0%' : '50%'"
         x2="50%"
-        :y2="info.pos.y < BOARD_SIZE ? '100%' : '50%'"
+        :y2="info.pos.y < BOARD_SIZE - 1 ? '100%' : '50%'"
       />
       <line
-        :x1="info.pos.x > 1 ? '0%' : '50%'"
+        :x1="info.pos.x > 0 ? '0%' : '50%'"
         y1="50%"
-        :x2="info.pos.x < BOARD_SIZE ? '100%' : '50%'"
+        :x2="info.pos.x < BOARD_SIZE - 1 ? '100%' : '50%'"
         y2="50%"
       />
       <line
@@ -67,15 +66,19 @@ const hasMarker = computed(
     <SinglePiece
       :type="activePiece"
       v-else
-      class="transition duration-75 opacity-0 group-hover:opacity-80"
+      class="transition opacity-0 group-hover:opacity-80"
     />
+
+    <!-- <span class="bg-white bg-opacity-90 absolute text-sm">
+      {{ info.power }}
+    </span> -->
   </div>
 </template>
 
 <style scoped>
 .chess-piece {
-  grid-column: v-bind("info.pos.x");
-  grid-row: v-bind("info.pos.y");
+  grid-column: calc(v-bind("info.pos.x") + 1);
+  grid-row: calc(v-bind("info.pos.y") + 1);
 }
 .cell-line {
   stroke-linecap: round;
