@@ -4,6 +4,37 @@ export const SIZE = 15;
 
 <script setup lang="ts">
 import PieceCell from "./PieceCell.vue";
+import { ref } from "vue";
+
+const props = defineProps<{ activePiece: number }>();
+const emit = defineEmits<{ (e: "chessplaced", idx: number): void }>();
+
+export interface CellInfo {
+  pos: {
+    x: number;
+    y: number;
+  };
+  piece: number;
+}
+
+const cellInfo = ref([] as CellInfo[]);
+for (let i = 1; i <= SIZE; i++) {
+  for (let j = 1; j <= SIZE; j++) {
+    cellInfo.value.push({
+      pos: {
+        x: i,
+        y: j,
+      },
+      piece: 0,
+    });
+  }
+}
+
+function placechess(idx: number) {
+  if (cellInfo.value[idx].piece) return;
+  cellInfo.value[idx].piece = props.activePiece;
+  emit("chessplaced", idx);
+}
 </script>
 
 <template>
@@ -18,9 +49,13 @@ import PieceCell from "./PieceCell.vue";
       p-1
     "
   >
-    <template v-for="y in SIZE" :key="y">
-      <PieceCell v-for="x in SIZE" :key="x" :x="x" :y="y" />
-    </template>
+    <PieceCell
+      v-for="(cell, i) in cellInfo"
+      :key="i"
+      :info="cell"
+      :active-piece="activePiece"
+      @placechess="placechess(i)"
+    />
   </div>
 </template>
 
