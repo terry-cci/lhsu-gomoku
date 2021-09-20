@@ -4,7 +4,7 @@ const props = defineProps<{ type: number }>();
 
 <template>
   <div
-    class="rounded-full w-3/4 h-3/4 relative shadow-lg border-2"
+    class="rounded-full w-4/5 h-4/5 relative shadow-lg border-2"
     :class="{
       'bg-black': type === 1,
       'bg-white': type === 2,

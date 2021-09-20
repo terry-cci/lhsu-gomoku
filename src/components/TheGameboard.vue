@@ -129,6 +129,7 @@ function placechess([x, y]: NumberPair, piece: number) {
 <template>
   <div
     class="
+      relative
       gameboard
       bg-yellow-200
       rounded
@@ -138,6 +139,22 @@ function placechess([x, y]: NumberPair, piece: number) {
       p-1
     "
   >
+    <!-- background image -->
+    <img
+      src="../assets/lhsu-logo.png"
+      alt="LHSU Logo"
+      class="
+        filter
+        hue-rotate-180
+        opacity-20
+        absolute
+        w-3/5
+        top-1/2
+        left-1/2
+        transform
+        -translate-x-1/2 -translate-y-1/2
+      "
+    />
     <template v-for="(col, x) in cellInfo" :key="x">
       <piece-cell
         v-for="(cell, y) in col"
