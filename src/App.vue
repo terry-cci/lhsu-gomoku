@@ -26,6 +26,7 @@ const victory = ref(0);
 
 function onVictory(piece: number, trace: NumberPair[][]) {
   victory.value = piece;
+  if (timingInterval !== undefined) clearInterval(timingInterval);
 }
 
 function onPlacement([x, y]: NumberPair) {
@@ -37,6 +38,11 @@ function onPlacement([x, y]: NumberPair) {
 
   const timingFunction = (piece: number) => () => {
     playerRemainingTime.value[piece] -= 0.1;
+
+    if (playerRemainingTime.value[piece] <= 0) {
+      onVictory(piece === 1 ? 2 : 1, []);
+      playerRemainingTime.value[piece] = 0;
+    }
   };
 
   if (!victory.value)

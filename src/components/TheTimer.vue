@@ -20,10 +20,12 @@ const timerString = computed(
       p-3
       rounded
       border-4 border-gray-400
-      font-mono
       text-4xl
+      w-36
+      text-center
     "
+    :class="time > 0 ? 'font-mono' : 'font-sans'"
   >
-    {{ timerString }}
+    {{ time > 0 ? timerString : "超時" }}
   </div>
 </template>
