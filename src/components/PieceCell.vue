@@ -9,7 +9,7 @@ const markers: NumberPair[] = [
 </script>
 
 <script setup lang="ts">
-import { CellInfo, SIZE as BOARD_SIZE } from "./TheGameboard.vue";
+import { CellInfo, SIZE as BOARD_SIZE } from "../App.vue";
 import SinglePiece from "./SinglePiece.vue";
 import { computed } from "vue";
 import { NumberPair } from "../App.vue";
@@ -17,11 +17,7 @@ import { NumberPair } from "../App.vue";
 const props = defineProps<{
   info: CellInfo;
   activePiece: number;
-  pieceClass: string[];
-  disabled: boolean;
 }>();
-
-const emit = defineEmits<{ (e: "placechess"): void }>();
 
 const hasMarker = computed(
   () =>
@@ -35,8 +31,6 @@ const hasMarker = computed(
   <div
     class="
       chess-piece
-      bg-white bg-opacity-0
-      hover:bg-opacity-80
       text-gray-600
       relative
       flex
@@ -45,7 +39,9 @@ const hasMarker = computed(
       cursor-pointer
       group
     "
-    @click="emit('placechess')"
+    :class="
+      info.selected && ['bg-white', 'bg-opacity-80', 'ring', 'ring-inset']
+    "
   >
     <svg class="w-full h-full cell-line stroke-current absolute">
       <line
@@ -70,17 +66,17 @@ const hasMarker = computed(
       />
     </svg>
 
-    <single-piece :type="info.piece" v-if="info.piece" :class="pieceClass" />
     <single-piece
-      :type="activePiece"
-      v-else
-      class="opacity-0"
-      :class="!disabled && ['group-hover:opacity-80']"
+      :type="info.piece"
+      v-if="info.piece"
+      :class="info.pieceClass"
     />
 
-    <!-- <span class="bg-white bg-opacity-90 absolute text-sm">
-      {{ info.power }}
-    </span> -->
+    <single-piece
+      v-else-if="info.selected"
+      :type="activePiece"
+      class="opacity-90"
+    />
   </div>
 </template>
 

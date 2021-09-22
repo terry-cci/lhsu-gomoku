@@ -3,6 +3,28 @@ export type NumberPair = [number, number];
 export function isSame(a: NumberPair, b: NumberPair) {
   return a[0] === b[0] && a[1] === b[1];
 }
+
+export const SIZE = 15;
+export type CellInfo = {
+  pos: NumberPair;
+  piece: number;
+  power: number[];
+  pieceClass: string[];
+  selected: boolean;
+};
+
+const COUNT_TO_VICTORY = 5;
+const DIRECTIONS = [
+  { dPos: [-1, -1], powerIdx: 0 },
+  { dPos: [0, -1], powerIdx: 1 },
+  { dPos: [1, -1], powerIdx: 2 },
+  { dPos: [-1, 0], powerIdx: 3 },
+  { dPos: [1, 0], powerIdx: 3 },
+  { dPos: [-1, 1], powerIdx: 2 },
+  { dPos: [0, 1], powerIdx: 1 },
+  { dPos: [1, 1], powerIdx: 0 },
+];
+export const TOTAL_TIME = 420;
 </script>
 
 <script setup lang="ts">
@@ -10,15 +32,104 @@ import TheGameboard from "./components/TheGameboard.vue";
 import { ref, watch } from "vue";
 import PlayerPanel from "./components/PlayerPanel.vue";
 
-const TOTAL_TIME = 420;
+// gameboard
+const cellInfo = ref<CellInfo[][]>([]);
+for (let i = 0; i < SIZE; i++) {
+  cellInfo.value.push([]);
+  for (let j = 0; j < SIZE; j++) {
+    cellInfo.value[i].push({
+      pos: [i, j],
+      piece: 0,
+      power: [],
+      pieceClass: [],
+      selected: false,
+    });
+  }
+}
+function isInBound([x, y]: NumberPair) {
+  return !(x < 0 || x >= SIZE || y < 0 || y >= SIZE);
+}
+function getCell([x, y]: NumberPair) {
+  return cellInfo.value[x][y];
+}
+function getPowerTrace([x, y]: NumberPair, powerIdx: number) {
+  const piece = getCell([x, y]).piece;
+  const trace: NumberPair[] = [[x, y]];
 
+  DIRECTIONS.filter((d) => d.powerIdx === powerIdx).forEach(
+    ({ dPos: [dx, dy] }) => {
+      for (
+        let i = 1;
+        isInBound([x + dx * i, y + dy * i]) &&
+        getCell([x + dx * i, y + dy * i]).piece === piece;
+        i++
+      ) {
+        trace.push([x + dx * i, y + dy * i]);
+      }
+    }
+  );
+
+  return trace;
+}
+function calcPower([x, y]: NumberPair) {
+  const cell = getCell([x, y]);
+  const piece = cell.piece;
+  cell.power = [1, 1, 1, 1];
+
+  // calc power of the cell
+  DIRECTIONS.forEach(({ dPos: [dx, dy], powerIdx }) => {
+    if (
+      isInBound([x + dx, y + dy]) &&
+      getCell([x + dx, y + dy]).piece === piece
+    ) {
+      cell.power[powerIdx] += getCell([x + dx, y + dy]).power[powerIdx];
+    }
+  });
+
+  // update power of the cells connected
+  DIRECTIONS.forEach(({ dPos: [dx, dy], powerIdx }) => {
+    for (
+      let i = 1;
+      isInBound([x + dx * i, y + dy * i]) &&
+      getCell([x + dx * i, y + dy * i]).piece === piece;
+      i++
+    ) {
+      getCell([x + dx * i, y + dy * i]).power[powerIdx] = cell.power[powerIdx];
+    }
+  });
+
+  // victory detected
+  if (cell.power.some((v) => v >= COUNT_TO_VICTORY)) {
+    const trace = cell.power
+      .map((v, i) => ({ idx: i, v }))
+      .filter((info) => info.v >= COUNT_TO_VICTORY)
+      .map((info) => getPowerTrace([x, y], info.idx));
+
+    onVictory(cell.piece, trace);
+  }
+}
+
+// placement
 const activePiece = ref(1);
-const placementHistory = ref([] as NumberPair[]);
-
+const placementHistory = ref<NumberPair[]>([]);
 function toggleActivePiece() {
   activePiece.value = activePiece.value === 1 ? 2 : 1;
 }
+function placechess([x, y]: NumberPair, piece: number) {
+  if (getCell([x, y]).piece) return;
+  if (gameStatus.value !== 1) return;
 
+  placementHistory.value.push([x, y]);
+  toggleActivePiece();
+  getCell([x, y]).piece = piece;
+  calcPower([x, y]);
+
+  if (timingInterval !== undefined) clearInterval(timingInterval);
+  if (!victory.value)
+    timingInterval = setInterval(timingFunction(activePiece.value), 100);
+}
+
+// timing
 let timingInterval: number | undefined;
 const playerRemainingTime = ref([0, TOTAL_TIME, TOTAL_TIME]);
 const timingFunction = (piece: number) => () => {
@@ -30,6 +141,7 @@ const timingFunction = (piece: number) => () => {
   }
 };
 
+// game status
 const gameStatus = ref(0); // 0 - waiting for players, 1 - in game, 2 - end
 const playerReady = ref([true, false, false]);
 function onReady(piece: number, status: boolean) {
@@ -46,22 +158,39 @@ watch(
   { deep: true }
 );
 
+// victory
 const victory = ref(0);
 function onVictory(piece: number, trace: NumberPair[][]) {
   victory.value = piece;
+  trace.flat().forEach((v) => {
+    getCell(v).pieceClass.push("ring-8", "ring-green-400");
+  });
   if (timingInterval !== undefined) clearInterval(timingInterval);
   gameStatus.value = 2;
 }
 
-function onPlacement([x, y]: NumberPair) {
-  placementHistory.value.push([x, y]);
+// selection
+const selectedCell = ref<NumberPair | null>(null);
+function unselect() {
+  if (selectedCell.value) {
+    getCell(selectedCell.value).selected = false;
+    selectedCell.value = null;
+  }
+}
+function onSelect([x, y]: NumberPair) {
+  if (gameStatus.value !== 1) return;
+  if (getCell([x, y]).piece) return;
 
-  toggleActivePiece();
+  unselect();
+  selectedCell.value = [x, y];
+  getCell(selectedCell.value).selected = true;
+}
 
-  if (timingInterval !== undefined) clearInterval(timingInterval);
-
-  if (!victory.value)
-    timingInterval = setInterval(timingFunction(activePiece.value), 100);
+function onConfirmSelect() {
+  if (selectedCell.value) {
+    placechess(selectedCell.value, activePiece.value);
+    unselect();
+  }
 }
 </script>
 
@@ -78,10 +207,9 @@ function onPlacement([x, y]: NumberPair) {
     "
   >
     <the-gameboard
+      :cell-info="cellInfo"
       :active-piece="activePiece"
-      :disabled="gameStatus !== 1"
-      @chessplaced="onPlacement"
-      @victory="onVictory"
+      @selectcell="onSelect"
     />
 
     <player-panel
@@ -92,7 +220,9 @@ function onPlacement([x, y]: NumberPair) {
       :active-piece="activePiece"
       :victory-piece="victory"
       :ready="playerReady[2]"
+      :selection="selectedCell"
       @ready="onReady"
+      @confirmselection="onConfirmSelect"
     />
     <player-panel
       :time="playerRemainingTime[1]"
@@ -101,7 +231,9 @@ function onPlacement([x, y]: NumberPair) {
       :piece="1"
       :victory-piece="victory"
       :ready="playerReady[1]"
+      :selection="selectedCell"
       @ready="onReady"
+      @confirmselection="onConfirmSelect"
     />
   </div>
 </template>
