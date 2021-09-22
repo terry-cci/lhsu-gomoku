@@ -9,15 +9,25 @@ const props = withDefaults(
     time: number;
     invert?: boolean;
     piece: number;
-    active: boolean;
+    activePiece: number;
+    gameStatus: number;
     victoryPiece: number;
+    ready: boolean;
   }>(),
   {
     invert: false,
   }
 );
 
+const emit = defineEmits<{
+  (e: "ready", piece: number, status: boolean): void;
+}>();
+
 const victory = computed(() => props.piece === props.victoryPiece);
+const active = computed(() => {
+  if (props.gameStatus === 1) return props.activePiece === props.piece;
+  return true;
+});
 </script>
 
 <template>
@@ -38,7 +48,7 @@ const victory = computed(() => props.piece === props.victoryPiece);
     "
     :class="[
       invert ? ['top-0', 'transform', 'rotate-180'] : ['bottom-0'],
-      { 'opacity-25': !active && !victoryPiece },
+      { 'opacity-50': !active },
       victoryPiece
         ? [victory ? ['bg-red-500'] : ['bg-gray-900'], 'text-white']
         : ['bg-yellow-200'],
@@ -51,9 +61,22 @@ const victory = computed(() => props.piece === props.victoryPiece);
       <span class="text-2xl"> 執{{ piece === 1 ? "黑" : "白" }} </span>
     </div>
 
-    <template v-if="victoryPiece">
+    <template v-if="gameStatus === 2">
       <span v-if="victory" class="text-5xl font-bold"> 勝 </span>
       <span v-else class="text-5xl font-bold"> 敗 </span>
+    </template>
+    <template v-else-if="gameStatus === 0">
+      <button
+        class="text-4xl rounded border-4 shadow-md w-1/3 py-4 border-yellow-900"
+        :class="
+          ready
+            ? ['bg-yellow-800', 'text-white']
+            : ['bg-yellow-50 text-black', 'hover:bg-yellow-100']
+        "
+        @click="emit('ready', piece, !ready)"
+      >
+        {{ ready ? "已準備" : "準備" }}
+      </button>
     </template>
     <span class="text-4xl" :class="active && ['font-bold']" v-else>
       {{ active ? "我方下子" : "對方下子" }}
