@@ -74,7 +74,7 @@ const hasMarker = computed(
     <single-piece
       :type="activePiece"
       v-else
-      class="transition opacity-0"
+      class="opacity-0"
       :class="!disabled && ['group-hover:opacity-80']"
     />
 
