@@ -6,6 +6,7 @@ import { NumberPair, isSame, SIZE, CellInfo } from "../App.vue";
 const props = defineProps<{
   activePiece: number;
   cellInfo: CellInfo[][];
+  gameStatus: number;
 }>();
 
 const emit = defineEmits<{
@@ -49,6 +50,7 @@ const emit = defineEmits<{
         :info="cell"
         :active-piece="activePiece"
         @click="emit('selectcell', [x, y])"
+        :hidden="gameStatus === 0"
       />
     </template>
   </div>

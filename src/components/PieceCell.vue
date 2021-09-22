@@ -17,6 +17,7 @@ import { NumberPair } from "../App.vue";
 const props = defineProps<{
   info: CellInfo;
   activePiece: number;
+  hidden: boolean;
 }>();
 
 const hasMarker = computed(
@@ -68,8 +69,11 @@ const hasMarker = computed(
 
     <single-piece
       :type="info.piece"
-      v-if="info.piece"
-      :class="info.pieceClass"
+      v-if="info.piece && !hidden"
+      :class="[
+        info.victory && ['ring-8', 'ring-green-400'],
+        info.latestPlacement && !info.victory && ['ring-8', 'ring-red-500'],
+      ]"
     />
 
     <single-piece
