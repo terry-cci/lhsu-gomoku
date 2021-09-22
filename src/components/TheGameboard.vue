@@ -143,7 +143,7 @@ function placechess([x, y]: NumberPair, piece: number) {
   >
     <!-- background image -->
     <img
-      src="../assets/lhsu-logo.png"
+      src="../assets/lhsu-logo.svg"
       alt="LHSU Logo"
       class="
         filter
