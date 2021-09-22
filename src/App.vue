@@ -22,21 +22,25 @@ function toggleActivePiece() {
 let timingInterval: number | undefined;
 const playerRemainingTime = ref([0, TOTAL_TIME, TOTAL_TIME]);
 
+const victory = ref(0);
+
+function onVictory(piece: number, trace: NumberPair[][]) {
+  victory.value = piece;
+}
+
 function onPlacement([x, y]: NumberPair) {
   placementHistory.value.push([x, y]);
 
   toggleActivePiece();
 
   if (timingInterval !== undefined) clearInterval(timingInterval);
-  const timingFunction = (piece: number) => () => {
-    playerRemainingTime.value[piece]--;
-  };
-  timingInterval = setInterval(timingFunction(activePiece.value), 1000);
-  timingFunction(activePiece.value)();
-}
 
-function onVictory(piece: number, trace: NumberPair[][]) {
-  console.debug(piece, trace);
+  const timingFunction = (piece: number) => () => {
+    playerRemainingTime.value[piece] -= 0.1;
+  };
+
+  if (!victory.value)
+    timingInterval = setInterval(timingFunction(activePiece.value), 100);
 }
 </script>
 
@@ -49,16 +53,29 @@ function onVictory(piece: number, trace: NumberPair[][]) {
       items-center
       justify-center
       bg-yellow-50
+      font-sans
     "
   >
     <the-gameboard
       :active-piece="activePiece"
+      :disabled="!!victory"
       @chessplaced="onPlacement"
       @victory="onVictory"
     />
 
-    <player-panel :time="playerRemainingTime[2]" :invert="true" />
-    <player-panel :time="playerRemainingTime[1]" />
+    <player-panel
+      :time="playerRemainingTime[2]"
+      :piece="2"
+      :invert="true"
+      :active="activePiece === 2"
+      :victory-piece="victory"
+    />
+    <player-panel
+      :time="playerRemainingTime[1]"
+      :active="activePiece === 1"
+      :piece="1"
+      :victory-piece="victory"
+    />
   </div>
 </template>
 

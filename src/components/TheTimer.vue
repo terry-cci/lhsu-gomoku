@@ -13,7 +13,17 @@ const timerString = computed(
 </script>
 
 <template>
-  <div class="bg-white p-3 rounded border-4 border-gray-400 font-mono text-4xl">
+  <div
+    class="
+      bg-white
+      text-gray-800
+      p-3
+      rounded
+      border-4 border-gray-400
+      font-mono
+      text-4xl
+    "
+  >
     {{ timerString }}
   </div>
 </template>

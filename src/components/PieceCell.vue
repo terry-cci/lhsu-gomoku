@@ -14,8 +14,13 @@ import SinglePiece from "./SinglePiece.vue";
 import { computed } from "vue";
 import { NumberPair } from "../App.vue";
 
-const props =
-  defineProps<{ info: CellInfo; activePiece: number; pieceClass: string[] }>();
+const props = defineProps<{
+  info: CellInfo;
+  activePiece: number;
+  pieceClass: string[];
+  disabled: boolean;
+}>();
+
 const emit = defineEmits<{ (e: "placechess"): void }>();
 
 const hasMarker = computed(
@@ -39,7 +44,6 @@ const hasMarker = computed(
       justify-center
       cursor-pointer
       group
-      transition
     "
     @click="emit('placechess')"
   >
@@ -70,7 +74,8 @@ const hasMarker = computed(
     <single-piece
       :type="activePiece"
       v-else
-      class="transition opacity-0 group-hover:opacity-80"
+      class="transition opacity-0"
+      :class="!disabled && ['group-hover:opacity-80']"
     />
 
     <!-- <span class="bg-white bg-opacity-90 absolute text-sm">

@@ -19,7 +19,7 @@ const DIRECTIONS = [
   { dPos: [1, 1], powerIdx: 0 },
 ];
 
-const props = defineProps<{ activePiece: number }>();
+const props = defineProps<{ activePiece: number; disabled: boolean }>();
 const emit = defineEmits<{
   (e: "chessplaced", pos: NumberPair): void;
   (e: "victory", piece: number, trace: NumberPair[][]): void;
@@ -119,6 +119,8 @@ function calcPower([x, y]: NumberPair) {
 
 function placechess([x, y]: NumberPair, piece: number) {
   if (cellInfo.value[x][y].piece) return;
+  if (props.disabled) return;
+
   cellInfo.value[x][y].piece = piece;
 
   calcPower([x, y]);
@@ -163,6 +165,7 @@ function placechess([x, y]: NumberPair, piece: number) {
         :active-piece="activePiece"
         @placechess="placechess([x, y], activePiece)"
         :piece-class="cell.pieceClass"
+        :disabled="disabled"
       />
     </template>
   </div>
