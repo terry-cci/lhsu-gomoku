@@ -7,6 +7,7 @@ const props = defineProps<{
   activePiece: number;
   cellInfo: CellInfo[][];
   gameStatus: number;
+  paused: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -50,7 +51,7 @@ const emit = defineEmits<{
         :info="cell"
         :active-piece="activePiece"
         @click="emit('selectcell', [x, y])"
-        :hidden="gameStatus === 0"
+        :hidden="gameStatus === 0 || paused"
       />
     </template>
   </div>
@@ -58,7 +59,7 @@ const emit = defineEmits<{
 
 <style scoped lang="scss">
 .gameboard {
-  $margin-to-screen: 1.5rem;
+  $margin-to-screen: 2rem;
   $side-length: calc(100vmin - $margin-to-screen);
   width: $side-length;
   height: $side-length;

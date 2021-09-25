@@ -32,22 +32,28 @@ export const TOTAL_TIME = 420;
 import TheGameboard from "./components/TheGameboard.vue";
 import { ref, watch } from "vue";
 import PlayerPanel from "./components/PlayerPanel.vue";
+import TheSidebar from "./components/TheSidebar.vue";
 
 // gameboard
 const cellInfo = ref<CellInfo[][]>([]);
-for (let i = 0; i < SIZE; i++) {
-  cellInfo.value.push([]);
-  for (let j = 0; j < SIZE; j++) {
-    cellInfo.value[i].push({
-      pos: [i, j],
-      piece: 0,
-      power: [],
-      victory: false,
-      selected: false,
-      latestPlacement: false,
-    });
+function initCellInfo() {
+  cellInfo.value = [];
+  for (let i = 0; i < SIZE; i++) {
+    cellInfo.value.push([]);
+    for (let j = 0; j < SIZE; j++) {
+      cellInfo.value[i].push({
+        pos: [i, j],
+        piece: 0,
+        power: [],
+        victory: false,
+        selected: false,
+        latestPlacement: false,
+      });
+    }
   }
 }
+initCellInfo();
+
 function isInBound([x, y]: NumberPair) {
   return !(x < 0 || x >= SIZE || y < 0 || y >= SIZE);
 }
@@ -126,9 +132,8 @@ function placechess([x, y]: NumberPair, piece: number) {
   calcPower([x, y]);
   latestPlacement.value = [x, y];
 
-  if (timingInterval !== undefined) clearInterval(timingInterval);
-  if (gameStatus.value === 1)
-    timingInterval = setInterval(timingFunction(activePiece.value), 100);
+  stopTiming();
+  if (gameStatus.value === 1) startTiming();
 }
 watch(
   placementHistory,
@@ -140,7 +145,11 @@ watch(
 
 // timing
 let timingInterval: number | undefined;
-const playerRemainingTime = ref([0, TOTAL_TIME, TOTAL_TIME]);
+const playerRemainingTime = ref([0, 0, 0]);
+function initPlayerRemainingTime() {
+  playerRemainingTime.value = [0, TOTAL_TIME, TOTAL_TIME];
+}
+initPlayerRemainingTime();
 const timingFunction = (piece: number) => () => {
   playerRemainingTime.value[piece] -= 0.1;
 
@@ -156,10 +165,22 @@ const timingFunction = (piece: number) => () => {
     );
   }
 };
+function startTiming() {
+  timingInterval = setInterval(timingFunction(activePiece.value), 100);
+}
+function stopTiming() {
+  if (timingInterval !== undefined) clearInterval(timingInterval);
+}
 
 // game status
 const gameStatus = ref(0); // 0 - waiting for players, 1 - in game, 2 - end
-const playerReady = ref([true, false, false]);
+const playerReady = ref([false, false, false]);
+function initGameStatus() {
+  gameStatus.value = 0;
+  playerReady.value = [true, false, false];
+}
+initGameStatus();
+
 function onReady(piece: number, status: boolean) {
   playerReady.value[piece] = status;
 }
@@ -170,7 +191,7 @@ watch(
       gameStatus.value = 1;
       localStorage.removeItem("remainingTime");
       localStorage.removeItem("placementHistory");
-      timingInterval = setInterval(timingFunction(activePiece.value), 100);
+      startTiming();
     }
   },
   { deep: true }
@@ -183,8 +204,9 @@ function onVictory(piece: number, trace: NumberPair[][]) {
   trace.flat().forEach((v) => {
     getCell(v).victory = true;
   });
-  if (timingInterval !== undefined) clearInterval(timingInterval);
+
   gameStatus.value = 2;
+  stopTiming();
 
   console.debug(placementHistory.value);
 }
@@ -192,11 +214,11 @@ function onVictory(piece: number, trace: NumberPair[][]) {
 // selection
 const selectedCell = ref<NumberPair | null>(null);
 watch(selectedCell, (newVal, oldVal) => {
-  if (newVal) {
-    getCell(newVal).selected = true;
-  }
   if (oldVal) {
     getCell(oldVal).selected = false;
+  }
+  if (newVal) {
+    getCell(newVal).selected = true;
   }
 });
 function onSelect([x, y]: NumberPair) {
@@ -222,6 +244,27 @@ function onConfirmSelect() {
     placechess(selectedCell.value, activePiece.value);
     selectedCell.value = null;
   }
+}
+
+// pausing
+const paused = ref(false);
+watch(paused, (v) => {
+  if (v) stopTiming();
+  else if (gameStatus.value === 1) startTiming();
+});
+
+// restart
+function restartGame() {
+  initCellInfo();
+  activePiece.value = 1;
+  placementHistory.value = [];
+  initPlayerRemainingTime();
+  stopTiming();
+  initGameStatus();
+  victory.value = 0;
+  selectedCell.value = null;
+  latestPlacement.value = null;
+  paused.value = false;
 }
 
 // load from localstorage
@@ -265,6 +308,13 @@ try {
       :active-piece="activePiece"
       @selectcell="onSelect"
       :game-status="gameStatus"
+      :paused="paused"
+    />
+
+    <the-sidebar
+      @pause="paused = true"
+      @resume="paused = false"
+      @restart="restartGame"
     />
 
     <player-panel

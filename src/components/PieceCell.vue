@@ -41,7 +41,8 @@ const hasMarker = computed(
       group
     "
     :class="
-      info.selected && ['bg-white', 'bg-opacity-80', 'ring', 'ring-inset']
+      info.selected &&
+      !hidden && ['bg-white', 'bg-opacity-80', 'ring', 'ring-inset']
     "
   >
     <svg class="w-full h-full cell-line stroke-current absolute">
@@ -77,7 +78,7 @@ const hasMarker = computed(
     />
 
     <single-piece
-      v-else-if="info.selected"
+      v-else-if="info.selected && !hidden"
       :type="activePiece"
       class="opacity-90"
     />
