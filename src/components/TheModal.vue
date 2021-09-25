@@ -55,15 +55,3 @@ const emit = defineEmits<{ (e: "confirm"): void; (e: "cancel"): void }>();
     </div>
   </transition>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 150ms ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

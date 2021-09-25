@@ -26,6 +26,24 @@ const DIRECTIONS = [
   { dPos: [1, 1], powerIdx: 0 },
 ];
 export const TOTAL_TIME = 420;
+
+export function genDefaultCellInfo() {
+  const info: CellInfo[][] = [];
+  for (let i = 0; i < SIZE; i++) {
+    info.push([]);
+    for (let j = 0; j < SIZE; j++) {
+      info[i].push({
+        pos: [i, j],
+        piece: 0,
+        power: [],
+        victory: false,
+        selected: false,
+        latestPlacement: false,
+      });
+    }
+  }
+  return info;
+}
 </script>
 
 <script setup lang="ts">
@@ -36,21 +54,9 @@ import TheSidebar from "./components/TheSidebar.vue";
 
 // gameboard
 const cellInfo = ref<CellInfo[][]>([]);
+
 function initCellInfo() {
-  cellInfo.value = [];
-  for (let i = 0; i < SIZE; i++) {
-    cellInfo.value.push([]);
-    for (let j = 0; j < SIZE; j++) {
-      cellInfo.value[i].push({
-        pos: [i, j],
-        piece: 0,
-        power: [],
-        victory: false,
-        selected: false,
-        latestPlacement: false,
-      });
-    }
-  }
+  cellInfo.value = genDefaultCellInfo();
 }
 initCellInfo();
 
@@ -315,6 +321,7 @@ try {
       @pause="paused = true"
       @resume="paused = false"
       @restart="restartGame"
+      :placement-history="placementHistory"
     />
 
     <player-panel
@@ -343,4 +350,24 @@ try {
   </div>
 </template>
 
-<style></style>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 150ms ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-from-left-enter-active,
+.slide-from-left-leave-active {
+  transition: transform 150ms ease;
+}
+
+.slide-from-left-enter-from,
+.slide-from-left-leave-to {
+  transform: translateX(-100%);
+}
+</style>
