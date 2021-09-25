@@ -18,9 +18,10 @@ const timerString = computed(
       bg-white
       text-gray-800
       px-2
-      shadow-sm
+      shadow-inner
       border border-gray-400
       text-center
+      sm:text-3xl sm:px-4 sm:py-2
     "
     :class="time > 0 ? 'font-mono' : 'font-sans'"
   >

@@ -23,7 +23,7 @@ const emit = defineEmits<{
       bg-yellow-200
       rounded
       shadow-md
-      border-2 border-gray-500
+      border-4 border-gray-500
       grid
       p-1
     "
@@ -60,9 +60,11 @@ const emit = defineEmits<{
 <style scoped lang="scss">
 .gameboard {
   $margin-to-screen: 2rem;
-  $side-length: clamp(320px, calc(100vmin - $margin-to-screen), 768px);
+  $side-length: calc(100vmin - $margin-to-screen);
   width: $side-length;
   height: $side-length;
+  max-width: 768px;
+  max-height: 768px;
 
   $grid-template: repeat(v-bind(SIZE), minmax(0, 1fr));
   grid-template-columns: $grid-template;

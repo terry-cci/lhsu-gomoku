@@ -271,6 +271,7 @@ function restartGame() {
   selectedCell.value = null;
   latestPlacement.value = null;
   paused.value = false;
+  victoryTrace.value = [];
 }
 
 // load from localstorage

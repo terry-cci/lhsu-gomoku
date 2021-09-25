@@ -17,6 +17,7 @@ const emit = defineEmits<{ (e: "confirm"): void; (e: "cancel"): void }>();
         items-center
         justify-center
         px-4
+        sm:px-24
       "
       v-if="open"
       @click.self="emit('cancel')"

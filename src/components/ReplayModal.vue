@@ -25,20 +25,24 @@ watch(curStep, (newVal, oldVal) => {
     } else {
       latestPlacement.value = null;
     }
+    cellInfo.value[x][y].victory = false;
   }
   for (let i = 0; i < newVal - oldVal; i++) {
     const history = props.placementHistory[oldVal + i];
     const [x, y] = history.pos;
     cellInfo.value[x][y].piece = history.piece;
     latestPlacement.value = [x, y];
+    cellInfo.value[x][y].victory = false;
   }
 
-  if (props.victoryTrace) {
-    if (newVal === props.placementHistory.length) {
+  if (newVal === props.placementHistory.length) {
+    if (props.victoryTrace) {
       props.victoryTrace.flat().forEach(([x, y]) => {
         cellInfo.value[x][y].victory = true;
       });
-    } else {
+    }
+  } else {
+    if (props.victoryTrace) {
       props.victoryTrace.flat().forEach(([x, y]) => {
         cellInfo.value[x][y].victory = false;
       });
@@ -120,6 +124,7 @@ watch(latestPlacement, (newVal, oldVal) => {
           w-full
           py-8
           px-8
+          sm:text-2xl
         "
       >
         <button
@@ -131,13 +136,14 @@ watch(latestPlacement, (newVal, oldVal) => {
             text-gray-600
             rounded
             disabled:opacity-50
+            sm:px-8 sm:py-2
           "
           :disabled="curStep <= 0"
           @click="curStep--"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-8"
+            class="w-8 sm:w-12"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -162,13 +168,14 @@ watch(latestPlacement, (newVal, oldVal) => {
             text-gray-600
             rounded
             disabled:opacity-50
+            sm:px-8 sm:py-2
           "
           @click="curStep++"
           :disabled="curStep >= placementHistory.length"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-8"
+            class="w-8 sm:w-12"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

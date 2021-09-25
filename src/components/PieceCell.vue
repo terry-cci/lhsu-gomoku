@@ -32,7 +32,7 @@ const hasMarker = computed(
   <div
     class="
       chess-piece
-      text-gray-600
+      text-gray-700
       relative
       flex
       items-center
@@ -42,7 +42,13 @@ const hasMarker = computed(
     "
     :class="
       info.selected &&
-      !hidden && ['bg-white', 'bg-opacity-80', 'ring-1', 'ring-inset']
+      !hidden && [
+        'bg-white',
+        'bg-opacity-80',
+        'ring-1',
+        'ring-inset',
+        'sm:ring-2',
+      ]
     "
   >
     <svg class="w-full h-full cell-line stroke-current absolute">
@@ -72,8 +78,9 @@ const hasMarker = computed(
       :type="info.piece"
       v-if="info.piece && !hidden"
       :class="[
-        info.victory && ['ring', 'ring-green-400'],
-        info.latestPlacement && !info.victory && ['ring', 'ring-red-500'],
+        info.victory && ['ring', 'ring-green-400', 'sm:ring-8'],
+        info.latestPlacement &&
+          !info.victory && ['ring', 'ring-red-500', 'sm:ring-4'],
       ]"
     />
 
