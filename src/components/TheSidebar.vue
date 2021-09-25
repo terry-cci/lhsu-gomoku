@@ -34,12 +34,6 @@ function restartGame() {
 
 // replay modal
 const replayModalOpen = ref(false);
-
-function onOverlayClicked() {
-  if (restartModalOpen.value) restartModalOpen.value = false;
-  else if (replayModalOpen.value) replayModalOpen.value = false;
-  else open.value = false;
-}
 </script>
 
 <template>
@@ -56,7 +50,6 @@ function onOverlayClicked() {
         z-10
       "
       v-show="open"
-      @click="onOverlayClicked"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
