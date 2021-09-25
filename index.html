@@ -2,14 +2,73 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/images/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
     <title>棋開得勝 - 五子棋</title>
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="fcd34d" />
+
+    <!-- pwa -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="五子棋" />
+    <meta name="apple-mobile-web-app-title" content="五子棋" />
+    <meta name="theme-color" content="#fcd34d" />
+    <meta name="msapplication-navbutton-color" content="#fcd34d" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="msapplication-starturl" content="./" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="images/icon/icon192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      type="image/png"
+      sizes="192x192"
+      href="images/icon/icon192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="images/icon/icon512.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      type="image/png"
+      sizes="512x512"
+      href="images/icon/icon512.png"
+    />
   </head>
   <body>
     <div id="app" class="h-screen"></div>
     <script type="module" src="/src/main.ts"></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        if (navigator.serviceWorker.controller) {
+          console.log(
+            "[Application] Active service worker found, no need to register"
+          );
+        } else {
+          navigator.serviceWorker
+            .register("./sw.js", {
+              scope: "./",
+            })
+            .then(function (reg) {
+              console.log(
+                "[Application] The service worker has been registered for the scope: " +
+                  reg.scope
+              );
+            });
+        }
+      }
+    </script>
   </body>
 </html>
