@@ -22,6 +22,8 @@ watch(curStep, (newVal, oldVal) => {
 
     if (oldVal + i - 1 >= 0) {
       latestPlacement.value = props.placementHistory[oldVal + i - 1].pos;
+    } else {
+      latestPlacement.value = null;
     }
   }
   for (let i = 0; i < newVal - oldVal; i++) {
@@ -47,6 +49,7 @@ watch(curStep, (newVal, oldVal) => {
 // latest placement
 const latestPlacement = ref<NumberPair | null>(null);
 watch(latestPlacement, (newVal, oldVal) => {
+  console.debug(newVal, oldVal);
   if (newVal) {
     const [x, y] = newVal;
     cellInfo.value[x][y].latestPlacement = true;
