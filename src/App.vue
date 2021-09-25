@@ -195,8 +195,6 @@ watch(
   (v) => {
     if (v.every((v) => v)) {
       gameStatus.value = 1;
-      localStorage.removeItem("remainingTime");
-      localStorage.removeItem("placementHistory");
       startTiming();
     }
   },
