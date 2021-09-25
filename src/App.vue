@@ -205,16 +205,16 @@ watch(
 
 // victory
 const victory = ref(0);
+const victoryTrace = ref<NumberPair[][] | null>(null);
 function onVictory(piece: number, trace: NumberPair[][]) {
   victory.value = piece;
   trace.flat().forEach((v) => {
     getCell(v).victory = true;
   });
+  victoryTrace.value = trace;
 
   gameStatus.value = 2;
   stopTiming();
-
-  console.debug(placementHistory.value);
 }
 
 // selection
@@ -261,6 +261,8 @@ watch(paused, (v) => {
 
 // restart
 function restartGame() {
+  localStorage.removeItem("remainingTime");
+  localStorage.removeItem("placementHistory");
   initCellInfo();
   activePiece.value = 1;
   placementHistory.value = [];
@@ -322,6 +324,7 @@ try {
       @resume="paused = false"
       @restart="restartGame"
       :placement-history="placementHistory"
+      :victory-trace="victoryTrace"
     />
 
     <player-panel

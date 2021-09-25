@@ -4,8 +4,10 @@ import TheModal from "./TheModal.vue";
 import ReplayModal from "./ReplayModal.vue";
 import { NumberPair } from "../App.vue";
 
-const props =
-  defineProps<{ placementHistory: { pos: NumberPair; piece: number }[] }>();
+const props = defineProps<{
+  placementHistory: { pos: NumberPair; piece: number }[];
+  victoryTrace: NumberPair[][] | null;
+}>();
 
 const emit = defineEmits<{
   (e: "pause"): void;
@@ -78,6 +80,7 @@ function onOverlayClicked() {
       :open="replayModalOpen"
       :placement-history="placementHistory"
       @close="replayModalOpen = false"
+      :victory-trace="victoryTrace"
     />
 
     <the-modal

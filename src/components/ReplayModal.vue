@@ -6,6 +6,7 @@ import TheGameboard from "./TheGameboard.vue";
 const props = defineProps<{
   placementHistory: { pos: NumberPair; piece: number }[];
   open: boolean;
+  victoryTrace: NumberPair[][] | null;
 }>();
 const emit = defineEmits<{
   (e: "close"): void;
@@ -18,11 +19,41 @@ watch(curStep, (newVal, oldVal) => {
     const history = props.placementHistory[oldVal + i];
     const [x, y] = history.pos;
     cellInfo.value[x][y].piece = 0;
+
+    if (oldVal + i - 1 >= 0) {
+      latestPlacement.value = props.placementHistory[oldVal + i - 1].pos;
+    }
   }
   for (let i = 0; i < newVal - oldVal; i++) {
     const history = props.placementHistory[oldVal + i];
     const [x, y] = history.pos;
     cellInfo.value[x][y].piece = history.piece;
+    latestPlacement.value = [x, y];
+  }
+
+  if (props.victoryTrace) {
+    if (newVal === props.placementHistory.length) {
+      props.victoryTrace.flat().forEach(([x, y]) => {
+        cellInfo.value[x][y].victory = true;
+      });
+    } else {
+      props.victoryTrace.flat().forEach(([x, y]) => {
+        cellInfo.value[x][y].victory = false;
+      });
+    }
+  }
+});
+
+// latest placement
+const latestPlacement = ref<NumberPair | null>(null);
+watch(latestPlacement, (newVal, oldVal) => {
+  if (newVal) {
+    const [x, y] = newVal;
+    cellInfo.value[x][y].latestPlacement = true;
+  }
+  if (oldVal) {
+    const [x, y] = oldVal;
+    cellInfo.value[x][y].latestPlacement = false;
   }
 });
 </script>
@@ -83,9 +114,9 @@ watch(curStep, (newVal, oldVal) => {
           flex
           items-center
           justify-between
-          w-2/3
-          px-5
-          mt-8
+          w-full
+          py-8
+          px-24
         "
       >
         <button

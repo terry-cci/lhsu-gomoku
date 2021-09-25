@@ -32,21 +32,22 @@ const emit = defineEmits<{ (e: "confirm"): void; (e: "cancel"): void }>();
       <div class="flex items-center justify-between mt-8 text-2xl">
         <button
           type="button"
-          class="px-8 py-2 bg-white border-2 border-gray-700 rounded"
+          class="
+            px-8
+            py-2
+            bg-indigo-500
+            text-white
+            border-2 border-gray-700
+            rounded
+          "
           @click="emit('confirm')"
         >
           確定
         </button>
+
         <button
           type="button"
-          class="
-            px-8
-            py-2
-            bg-red-500
-            text-white
-            border-2 border-red-700
-            rounded
-          "
+          class="px-8 py-2 bg-white border-2 border-gray-700 rounded"
           @click="emit('cancel')"
         >
           取消
