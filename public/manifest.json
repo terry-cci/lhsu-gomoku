@@ -5,8 +5,14 @@
   "display": "fullscreen",
   "background_color": "#fffbeb",
   "icons": [{
-    "src": "images/logo.png",
-    "sizes": "48x48 72x72 96x96 144x144 168x168 192x192",
+    "src": "images/icon/icon192.png",
+    "sizes": "192x192",
     "type": "image/png"
-  }]
+  }, {
+    "src": "images/icon/icon512.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }],
+  "theme_color": "#fcd34d",
+  "orientation": "portrait"
 }
