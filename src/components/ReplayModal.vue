@@ -81,8 +81,8 @@ watch(latestPlacement, (newVal, oldVal) => {
         class="
           text-white
           absolute
-          right-2
-          top-2
+          right-0
+          top-0
           p-4
           rounded
           bg-white bg-opacity-0
@@ -92,7 +92,7 @@ watch(latestPlacement, (newVal, oldVal) => {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="w-12"
+          class="w-8"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -113,19 +113,19 @@ watch(latestPlacement, (newVal, oldVal) => {
       />
       <div
         class="
-          text-white text-3xl
+          text-white text-lg
           flex
           items-center
           justify-between
           w-full
           py-8
-          px-24
+          px-8
         "
       >
         <button
           type="button"
           class="
-            bg-yellow-200
+            bg-yellow-100
             px-4
             py-1
             text-gray-600
@@ -137,7 +137,7 @@ watch(latestPlacement, (newVal, oldVal) => {
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-12"
+            class="w-8"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -156,7 +156,7 @@ watch(latestPlacement, (newVal, oldVal) => {
         <button
           type="button"
           class="
-            bg-yellow-200
+            bg-yellow-100
             px-4
             py-1
             text-gray-600
@@ -168,7 +168,7 @@ watch(latestPlacement, (newVal, oldVal) => {
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="w-12"
+            class="w-8"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

@@ -92,29 +92,17 @@ function onOverlayClicked() {
     </the-modal>
   </template>
 
-  <div
-    class="
-      absolute
-      left-0
-      top-1/2
-      transform
-      -translate-y-1/2
-      flex
-      items-center
-      z-10
-    "
-  >
+  <div class="absolute left-0 top-1/4 flex items-center z-10">
     <transition name="slide-from-left">
       <button
         class="
+          absolute
+          top-0
           bg-white
           rounded-r
-          py-8
+          py-4
           border border-l-0 border-gray-800
           opacity-80
-          absolute
-          left-0
-          transition
         "
         v-if="!open"
         type="button"
@@ -122,11 +110,10 @@ function onOverlayClicked() {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-8 w-8 transition"
+          class="w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          :class="open ? ['transform rotate-180'] : ['']"
         >
           <path
             stroke-linecap="round"
@@ -141,12 +128,13 @@ function onOverlayClicked() {
     <transition name="slide-from-left">
       <div
         class="
+          absolute
+          top-0
           flex flex-col
           bg-white
           p-2
+          rounded-r
           border-l-0 border-2 border-indigo-500
-          transition
-          relative
         "
         v-if="open"
       >
@@ -156,10 +144,10 @@ function onOverlayClicked() {
             text-white
             bg-indigo-600
             rounded
-            w-16
-            h-16
+            w-12
+            h-12
             p-3
-            shoadow
+            shadow
             mb-2
             flex
             items-center
@@ -188,12 +176,12 @@ function onOverlayClicked() {
             text-white
             bg-red-600
             rounded
-            shoadow
+            shadow
             flex
             items-center
             justify-center
-            w-16
-            h-16
+            w-12
+            h-12
             p-2
           "
           @click="restartModalOpen = !restartModalOpen"

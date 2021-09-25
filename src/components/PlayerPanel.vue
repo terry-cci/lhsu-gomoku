@@ -38,16 +38,15 @@ const active = computed(() => {
     class="
       player-panel
       absolute
-      inset-x-4
-      border-4 border-b-0 border-gray-600
+      inset-x-0
+      border-t border-gray-600
       shadow
-      rounded-t
       flex
+      justify-between
       items-center
-      justify-center
+      py-3
       px-5
       transition
-      duration-100
     "
     :class="[
       invert ? ['top-0', 'transform', 'rotate-180'] : ['bottom-0'],
@@ -57,59 +56,55 @@ const active = computed(() => {
         : ['bg-yellow-200'],
     ]"
   >
-    <div class="absolute left-5 flex flex-col items-center justify-center">
-      <div class="w-14 h-14">
+    <div class="flex flex-col items-center justify-center">
+      <div class="w-8 h-8">
         <single-piece class="w-full h-full" :type="piece" />
       </div>
-      <span class="text-2xl"> 執{{ piece === 1 ? "黑" : "白" }} </span>
+      <span class="text-sm"> 執{{ piece === 1 ? "黑" : "白" }} </span>
     </div>
 
-    <template v-if="gameStatus === 2">
-      <span v-if="victory" class="text-5xl font-bold"> 勝 </span>
-      <span v-else class="text-5xl font-bold"> 敗 </span>
-    </template>
-    <template v-else-if="gameStatus === 0">
-      <button
-        class="text-4xl rounded border-4 shadow-md w-1/3 py-4 border-yellow-900"
-        :class="
-          ready
-            ? ['bg-yellow-800', 'text-white']
-            : ['bg-yellow-50 text-black', 'hover:bg-yellow-100']
-        "
-        @click="emit('ready', piece, !ready)"
-      >
-        {{ ready ? "已準備" : "準備" }}
-      </button>
-    </template>
-    <template v-else>
-      <button
-        class="
-          border-4
-          rounded
-          shadow-md
-          w-1/3
-          py-4
-          text-4xl
-          border-green-800
-          bg-green-600
-          text-white
-        "
-        @click="emit('confirmselection')"
-        v-if="active && selection"
-      >
-        確認下子
-      </button>
-      <span class="text-4xl" :class="active && ['font-bold']" v-else>
-        {{ active ? "我方下子" : "對方下子" }}
-      </span>
-    </template>
+    <div class="absolute left-1/2 transform -translate-x-1/2">
+      <template v-if="gameStatus === 2">
+        <span v-if="victory" class="text-4xl font-bold"> 勝 </span>
+        <span v-else class="text-4xl font-bold"> 敗 </span>
+      </template>
+      <template v-else-if="gameStatus === 0">
+        <button
+          class="text-lg rounded border-2 shadow w-28 py-2 border-yellow-700"
+          :class="
+            ready
+              ? ['bg-yellow-800', 'text-white']
+              : ['bg-yellow-50 text-black', 'hover:bg-yellow-100']
+          "
+          @click="emit('ready', piece, !ready)"
+        >
+          {{ ready ? "已準備" : "準備" }}
+        </button>
+      </template>
+      <template v-else>
+        <button
+          class="
+            text-lg
+            border-2
+            rounded
+            shadow
+            w-28
+            py-1
+            border-green-800
+            bg-green-600
+            text-white
+          "
+          @click="emit('confirmselection')"
+          v-if="active && selection"
+        >
+          確認下子
+        </button>
+        <span class="text-xl" :class="active && ['font-bold']" v-else>
+          {{ active ? "我方下子" : "對方下子" }}
+        </span>
+      </template>
+    </div>
 
-    <the-timer class="absolute right-5" :time="time" />
+    <the-timer class="" :time="time" />
   </div>
 </template>
-
-<style scoped>
-.player-panel {
-  height: calc((100vh - 100vmin) / 2 - 0.5rem);
-}
-</style>

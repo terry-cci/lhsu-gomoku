@@ -42,7 +42,7 @@ const hasMarker = computed(
     "
     :class="
       info.selected &&
-      !hidden && ['bg-white', 'bg-opacity-80', 'ring', 'ring-inset']
+      !hidden && ['bg-white', 'bg-opacity-80', 'ring-1', 'ring-inset']
     "
   >
     <svg class="w-full h-full cell-line stroke-current absolute">
@@ -72,8 +72,8 @@ const hasMarker = computed(
       :type="info.piece"
       v-if="info.piece && !hidden"
       :class="[
-        info.victory && ['ring-8', 'ring-green-400'],
-        info.latestPlacement && !info.victory && ['ring-8', 'ring-red-500'],
+        info.victory && ['ring', 'ring-green-400'],
+        info.latestPlacement && !info.victory && ['ring', 'ring-red-500'],
       ]"
     />
 

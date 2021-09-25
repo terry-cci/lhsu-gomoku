@@ -23,7 +23,7 @@ const emit = defineEmits<{
       bg-yellow-200
       rounded
       shadow-md
-      border-4 border-gray-500
+      border-2 border-gray-500
       grid
       p-1
     "
@@ -60,7 +60,7 @@ const emit = defineEmits<{
 <style scoped lang="scss">
 .gameboard {
   $margin-to-screen: 2rem;
-  $side-length: calc(100vmin - $margin-to-screen);
+  $side-length: clamp(320px, calc(100vmin - $margin-to-screen), 768px);
   width: $side-length;
   height: $side-length;
 

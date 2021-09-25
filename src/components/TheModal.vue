@@ -8,50 +8,59 @@ const emit = defineEmits<{ (e: "confirm"): void; (e: "cancel"): void }>();
 <template>
   <transition name="fade">
     <div
-      v-if="open"
       class="
         fixed
-        top-1/2
-        left-1/2
-        transform
-        -translate-x-1/2 -translate-y-1/2
-        z-30
-        w-2/3
-        bg-yellow-50
-        rounded
-        border-4 border-yellow-400
-        shadow
-        py-10
-        px-10
+        inset-0
+        bg-black bg-opacity-75
+        z-20
         flex flex-col
+        items-center
+        justify-center
+        px-4
       "
+      v-if="open"
+      @click.self="emit('cancel')"
     >
-      <div class="text-3xl">
-        <slot></slot>
-      </div>
-      <div class="flex items-center justify-between mt-8 text-2xl">
-        <button
-          type="button"
-          class="
-            px-8
-            py-2
-            bg-indigo-500
-            text-white
-            border-2 border-gray-700
-            rounded
-          "
-          @click="emit('confirm')"
-        >
-          確定
-        </button>
+      <div
+        class="
+          w-full
+          bg-yellow-50
+          rounded
+          border-2 border-yellow-200
+          shadow
+          p-4
+          flex flex-col
+        "
+      >
+        <div class="text-lg">
+          <slot></slot>
+        </div>
+        <div class="flex items-center justify-end mt-8">
+          <button
+            type="button"
+            class="
+              px-5
+              py-2
+              bg-indigo-500
+              border
+              text-white
+              shadow
+              rounded
+              mr-2
+            "
+            @click="emit('confirm')"
+          >
+            確定
+          </button>
 
-        <button
-          type="button"
-          class="px-8 py-2 bg-white border-2 border-gray-700 rounded"
-          @click="emit('cancel')"
-        >
-          取消
-        </button>
+          <button
+            type="button"
+            class="px-5 py-2 bg-white border text-gray-700 shadow rounded"
+            @click="emit('cancel')"
+          >
+            取消
+          </button>
+        </div>
       </div>
     </div>
   </transition>
