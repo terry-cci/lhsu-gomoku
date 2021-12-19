@@ -44,11 +44,17 @@ export function genDefaultCellInfo() {
   }
   return info;
 }
+
+export type SingleGameHistory = {
+  history: { pos: NumberPair; piece: number }[];
+  victoryTrace: NumberPair[][] | null;
+  victoryPiece: number;
+};
 </script>
 
 <script setup lang="ts">
 import TheGameboard from "./components/TheGameboard.vue";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import PlayerPanel from "./components/PlayerPanel.vue";
 import TheSidebar from "./components/TheSidebar.vue";
 
@@ -123,16 +129,28 @@ function calcPower([x, y]: NumberPair) {
   }
 }
 
+// game count
+const gameCount = computed(() => placementHistory.value.length);
+
 // placement
 const activePiece = ref(1);
-const placementHistory = ref<{ pos: NumberPair; piece: number }[]>([]);
+const placementHistory = ref<SingleGameHistory[]>([]);
+const latestHistory = computed(
+  () => placementHistory.value[placementHistory.value.length - 1]
+);
+initHistory();
+
+function getPieceFromPlayer(x: number) {
+  return ((x - 1 + ((placementHistory.value.length - 1) % 2)) % 2) + 1;
+}
+
 function toggleActivePiece() {
   activePiece.value = activePiece.value === 1 ? 2 : 1;
 }
 function placechess([x, y]: NumberPair, piece: number) {
   if (getCell([x, y]).piece) return;
 
-  placementHistory.value.push({ pos: [x, y], piece });
+  latestHistory.value.history.push({ pos: [x, y], piece });
   toggleActivePiece();
   getCell([x, y]).piece = piece;
   calcPower([x, y]);
@@ -187,15 +205,30 @@ function initGameStatus() {
 }
 initGameStatus();
 
-function onReady(piece: number, status: boolean) {
-  playerReady.value[piece] = status;
+function onReady(player: number, status: boolean) {
+  if ([0, 2].includes(gameStatus.value)) {
+    playerReady.value[player] = status;
+  }
 }
 watch(
   playerReady,
   (v) => {
     if (v.every((v) => v)) {
-      gameStatus.value = 1;
-      startTiming();
+      switch (gameStatus.value) {
+        case 0:
+          gameStatus.value = 1;
+          startTiming();
+          break;
+
+        case 2:
+          nextGame();
+          gameStatus.value = 1;
+          startTiming();
+          break;
+
+        default:
+          break;
+      }
     }
   },
   { deep: true }
@@ -203,15 +236,17 @@ watch(
 
 // victory
 const victory = ref(0);
-const victoryTrace = ref<NumberPair[][] | null>(null);
+// const victoryTrace = ref<NumberPair[][] | null>(null);
 function onVictory(piece: number, trace: NumberPair[][]) {
   victory.value = piece;
   trace.flat().forEach((v) => {
     getCell(v).victory = true;
   });
-  victoryTrace.value = trace;
+  latestHistory.value.victoryTrace = trace;
+  latestHistory.value.victoryPiece = piece;
 
   gameStatus.value = 2;
+  playerReady.value = [true, false, false];
   stopTiming();
 }
 
@@ -258,12 +293,24 @@ watch(paused, (v) => {
 });
 
 // restart
+function initHistory() {
+  placementHistory.value.push({
+    history: [],
+    victoryTrace: null,
+    victoryPiece: 0,
+  });
+}
+
 function restartGame() {
+  placementHistory.value = [];
+  nextGame();
+}
+
+function nextGame() {
   localStorage.removeItem("remainingTime");
-  localStorage.removeItem("placementHistory");
   initCellInfo();
   activePiece.value = 1;
-  placementHistory.value = [];
+  initHistory();
   initPlayerRemainingTime();
   stopTiming();
   initGameStatus();
@@ -271,7 +318,6 @@ function restartGame() {
   selectedCell.value = null;
   latestPlacement.value = null;
   paused.value = false;
-  victoryTrace.value = [];
 }
 
 // load from localstorage
@@ -286,12 +332,21 @@ try {
 try {
   const historyJSON = localStorage.getItem("placementHistory");
   if (historyJSON) {
-    const savedHistory: { pos: NumberPair; piece: number }[] = JSON.parse(
+    const savedHistory: typeof placementHistory.value = JSON.parse(
       historyJSON as string
     );
-    savedHistory.forEach((history) => {
-      placechess(history.pos, history.piece);
-    });
+
+    placementHistory.value = savedHistory.slice(0, -1);
+
+    initHistory();
+
+    if (savedHistory.length) {
+      savedHistory[savedHistory.length - 1].history.forEach(
+        ({ pos, piece }) => {
+          placechess(pos, piece);
+        }
+      );
+    }
   }
 } catch (error) {
   playerRemainingTime.value = [0, TOTAL_TIME, TOTAL_TIME];
@@ -323,30 +378,29 @@ try {
       @resume="paused = false"
       @restart="restartGame"
       :placement-history="placementHistory"
-      :victory-trace="victoryTrace"
     />
 
     <player-panel
       :time="playerRemainingTime[2]"
-      :piece="2"
+      :piece="getPieceFromPlayer(2)"
       :invert="true"
       :game-status="gameStatus"
       :active-piece="activePiece"
       :victory-piece="victory"
       :ready="playerReady[2]"
       :selection="selectedCell"
-      @ready="onReady"
+      @ready="onReady(2, !playerReady[2])"
       @confirmselection="onConfirmSelect"
     />
     <player-panel
       :time="playerRemainingTime[1]"
       :game-status="gameStatus"
       :active-piece="activePiece"
-      :piece="1"
+      :piece="getPieceFromPlayer(1)"
       :victory-piece="victory"
       :ready="playerReady[1]"
       :selection="selectedCell"
-      @ready="onReady"
+      @ready="onReady(1, !playerReady[1])"
       @confirmselection="onConfirmSelect"
     />
   </div>

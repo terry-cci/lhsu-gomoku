@@ -2,11 +2,10 @@
 import { ref, watch } from "vue";
 import TheModal from "./TheModal.vue";
 import ReplayModal from "./ReplayModal.vue";
-import { NumberPair } from "../App.vue";
+import { SingleGameHistory } from "../App.vue";
 
 const props = defineProps<{
-  placementHistory: { pos: NumberPair; piece: number }[];
-  victoryTrace: NumberPair[][] | null;
+  placementHistory: SingleGameHistory[];
 }>();
 
 const emit = defineEmits<{
@@ -74,7 +73,6 @@ const replayModalOpen = ref(false);
       :open="replayModalOpen"
       :placement-history="placementHistory"
       @close="replayModalOpen = false"
-      :victory-trace="victoryTrace"
     />
 
     <the-modal

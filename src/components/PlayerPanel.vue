@@ -22,7 +22,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: "ready", piece: number, status: boolean): void;
+  (e: "ready"): void;
   (e: "confirmselection"): void;
 }>();
 
@@ -69,11 +69,29 @@ const active = computed(() => {
     </div>
 
     <div class="absolute left-1/2 transform -translate-x-1/2">
-      <template v-if="gameStatus === 2">
+      <div v-if="gameStatus === 2" class="flex items-center">
         <span class="text-4xl font-bold sm:text-6xl">
           {{ victory ? "勝" : "敗" }}
         </span>
-      </template>
+
+        <button
+          class="
+            rounded
+            border-2
+            shadow
+            w-28
+            py-2
+            ml-16
+            sm:text-3xl sm:w-44 sm:py-4
+          "
+          :class="
+            ready ? ['bg-green-600', 'text-white'] : ['bg-white', 'text-black']
+          "
+          @click="emit('ready')"
+        >
+          {{ ready ? "已準備" : "準備下一局" }}
+        </button>
+      </div>
       <template v-else-if="gameStatus === 0">
         <button
           class="
@@ -88,7 +106,7 @@ const active = computed(() => {
           :class="
             ready ? ['bg-green-600', 'text-white'] : ['bg-white', 'text-black']
           "
-          @click="emit('ready', piece, !ready)"
+          @click="emit('ready')"
         >
           {{ ready ? "已準備" : "準備" }}
         </button>
