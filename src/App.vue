@@ -140,8 +140,11 @@ const latestHistory = computed(
 );
 initHistory();
 
-function getPieceFromPlayer(x: number) {
-  return ((x - 1 + ((placementHistory.value.length - 1) % 2)) % 2) + 1;
+function getPieceFromPlayer(player: number, gameCount: number) {
+  return ((player - 1 + ((gameCount - 1) % 2)) % 2) + 1;
+}
+function getPlayerFromPiece(piece: number, gameCount: number) {
+  return ((piece - 1 + ((gameCount - 1) % 2)) % 2) + 1;
 }
 
 function toggleActivePiece() {
@@ -175,14 +178,16 @@ function initPlayerRemainingTime() {
 }
 initPlayerRemainingTime();
 const timingFunction = (piece: number) => () => {
-  playerRemainingTime.value[piece] -= 0.1;
+  const player = getPlayerFromPiece(piece, gameCount.value);
 
-  if (playerRemainingTime.value[piece] <= 0) {
+  playerRemainingTime.value[player] -= 0.1;
+
+  if (playerRemainingTime.value[player] <= 0) {
     onVictory(piece === 1 ? 2 : 1, []);
-    playerRemainingTime.value[piece] = 0;
+    playerRemainingTime.value[player] = 0;
   }
 
-  if (playerRemainingTime.value[piece] % 1 <= 0.1) {
+  if (playerRemainingTime.value[player] % 1 <= 0.1) {
     localStorage.setItem(
       "remainingTime",
       JSON.stringify(playerRemainingTime.value)
@@ -236,7 +241,6 @@ watch(
 
 // victory
 const victory = ref(0);
-// const victoryTrace = ref<NumberPair[][] | null>(null);
 function onVictory(piece: number, trace: NumberPair[][]) {
   victory.value = piece;
   trace.flat().forEach((v) => {
@@ -248,6 +252,13 @@ function onVictory(piece: number, trace: NumberPair[][]) {
   gameStatus.value = 2;
   playerReady.value = [true, false, false];
   stopTiming();
+}
+
+function getVictoryCount(player: number) {
+  return placementHistory.value.filter(
+    ({ victoryPiece }, idx) =>
+      victoryPiece === getPieceFromPlayer(player, idx + 1)
+  ).length;
 }
 
 // selection
@@ -382,11 +393,13 @@ try {
 
     <player-panel
       :time="playerRemainingTime[2]"
-      :piece="getPieceFromPlayer(2)"
+      :piece="getPieceFromPlayer(2, gameCount)"
+      :game-count="gameCount"
       :invert="true"
       :game-status="gameStatus"
       :active-piece="activePiece"
       :victory-piece="victory"
+      :victory-count="getVictoryCount(2)"
       :ready="playerReady[2]"
       :selection="selectedCell"
       @ready="onReady(2, !playerReady[2])"
@@ -394,10 +407,12 @@ try {
     />
     <player-panel
       :time="playerRemainingTime[1]"
+      :game-count="gameCount"
       :game-status="gameStatus"
       :active-piece="activePiece"
-      :piece="getPieceFromPlayer(1)"
+      :piece="getPieceFromPlayer(1, gameCount)"
       :victory-piece="victory"
+      :victory-count="getVictoryCount(1)"
       :ready="playerReady[1]"
       :selection="selectedCell"
       @ready="onReady(1, !playerReady[1])"

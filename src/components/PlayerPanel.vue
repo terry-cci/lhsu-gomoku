@@ -8,7 +8,9 @@ import { NumberPair } from "../App.vue";
 const props = withDefaults(
   defineProps<{
     time: number;
+    gameCount: number;
     invert?: boolean;
+    victoryCount: number;
     piece: number;
     activePiece: number;
     gameStatus: number;
@@ -60,7 +62,8 @@ const active = computed(() => {
     ]"
   >
     <div class="flex flex-col items-center justify-center">
-      <div class="w-8 h-8 sm:w-14 sm:h-14">
+      <span class="font-bold text-xl mb-0.5">{{ victoryCount }} 勝</span>
+      <div class="w-8 h-8 sm:w-10 sm:h-10">
         <single-piece class="w-full h-full" :type="piece" />
       </div>
       <span class="text-sm sm:text-base">
@@ -140,6 +143,9 @@ const active = computed(() => {
       </template>
     </div>
 
-    <the-timer class="" :time="time" />
+    <div class="flex flex-col items-center">
+      <the-timer class="" :time="time" />
+      <span> 第 {{ gameCount }} 局 </span>
+    </div>
   </div>
 </template>
