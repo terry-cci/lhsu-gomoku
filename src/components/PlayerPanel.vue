@@ -17,6 +17,8 @@ const props = withDefaults(
     victoryPiece: number;
     ready: boolean;
     selection: NumberPair | null;
+    suddenDeath: boolean;
+    allowNextGame: boolean;
   }>(),
   {
     invert: false,
@@ -57,7 +59,14 @@ const active = computed(() => {
       invert ? ['top-0', 'rotate-180'] : ['bottom-0'],
       { 'opacity-50': !active },
       victoryPiece
-        ? [victory ? ['bg-red-500'] : ['bg-gray-900'], 'text-white']
+        ? [
+            victory
+              ? ['bg-red-500']
+              : victoryPiece === 3
+              ? ['bg-gray-600']
+              : ['bg-gray-900'],
+            'text-white',
+          ]
         : ['bg-yellow-300'],
     ]"
   >
@@ -73,9 +82,10 @@ const active = computed(() => {
 
     <div class="absolute left-1/2 transform -translate-x-1/2">
       <div v-if="gameStatus === 2" class="flex items-center">
-        <span class="text-4xl font-bold sm:text-6xl">
-          {{ victory ? "勝" : "敗" }}
-        </span>
+        <div class="text-4xl font-bold sm:text-6xl flex flex-col items-center">
+          {{ victory ? "勝" : victoryPiece === 3 ? "和" : "敗" }}
+          <span v-if="!allowNextGame" class="text-xl mt-3"> 對戰已結束 </span>
+        </div>
 
         <button
           class="
@@ -90,6 +100,7 @@ const active = computed(() => {
           :class="
             ready ? ['bg-green-600', 'text-white'] : ['bg-white', 'text-black']
           "
+          v-if="allowNextGame"
           @click="emit('ready')"
         >
           {{ ready ? "已準備" : "準備下一局" }}
@@ -133,13 +144,16 @@ const active = computed(() => {
         >
           確認下子
         </button>
-        <span
-          class="text-xl sm:text-3xl"
+        <div
+          class="text-xl sm:text-3xl flex flex-col items-center"
           :class="active && ['font-bold']"
           v-else
         >
           {{ active ? "我方下子" : "對方下子" }}
-        </span>
+          <span v-if="suddenDeath" class="text-2xl mt-1 text-red-600"
+            >決勝局</span
+          >
+        </div>
       </template>
     </div>
 

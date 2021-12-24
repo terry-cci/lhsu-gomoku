@@ -1,7 +1,11 @@
 <script setup lang="ts">
-const props = defineProps<{
-  open: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    open: boolean;
+    confirmOnly?: boolean;
+  }>(),
+  { confirmOnly: true }
+);
 const emit = defineEmits<{ (e: "confirm"): void; (e: "cancel"): void }>();
 </script>
 
@@ -58,6 +62,7 @@ const emit = defineEmits<{ (e: "confirm"): void; (e: "cancel"): void }>();
             type="button"
             class="px-5 py-2 bg-white border text-gray-700 shadow rounded"
             @click="emit('cancel')"
+            v-if="!confirmOnly"
           >
             取消
           </button>

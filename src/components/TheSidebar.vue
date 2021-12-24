@@ -79,6 +79,7 @@ const replayModalOpen = ref(false);
       :open="restartModalOpen"
       @cancel="restartModalOpen = false"
       @confirm="restartGame"
+      :confirm-only="false"
     >
       確定要清除所有的數據嗎?
     </the-modal>

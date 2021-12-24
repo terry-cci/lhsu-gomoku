@@ -5,6 +5,7 @@ export function isSame(a: NumberPair, b: NumberPair) {
 }
 
 export const SIZE = 15;
+export const VICTORY_GAME_COUNT = 2;
 export type CellInfo = {
   pos: NumberPair;
   piece: number;
@@ -57,6 +58,7 @@ import TheGameboard from "./components/TheGameboard.vue";
 import { computed, ref, watch } from "vue";
 import PlayerPanel from "./components/PlayerPanel.vue";
 import TheSidebar from "./components/TheSidebar.vue";
+import TheModal from "./components/TheModal.vue";
 
 // gameboard
 const cellInfo = ref<CellInfo[][]>([]);
@@ -128,7 +130,6 @@ function calcPower([x, y]: NumberPair) {
     onVictory(cell.piece, trace);
   }
 }
-
 // game count
 const gameCount = computed(() => placementHistory.value.length);
 
@@ -139,6 +140,23 @@ const latestHistory = computed(
   () => placementHistory.value[placementHistory.value.length - 1]
 );
 initHistory();
+
+// draw
+function checkDraw() {
+  const draw = cellInfo.value.flat().every((cell) => cell.piece);
+  if (draw) {
+    onVictory(3, []);
+  }
+}
+const suddenDeath = computed(() =>
+  placementHistory.value.some((history) => history.victoryPiece === 3)
+);
+const suddenDeathModal = ref(suddenDeath.value);
+watch(suddenDeath, (v) => {
+  if (v) {
+    suddenDeathModal.value = !isGameEnd.value;
+  }
+});
 
 function getPieceFromPlayer(player: number, gameCount: number) {
   return ((player - 1 + ((gameCount - 1) % 2)) % 2) + 1;
@@ -158,6 +176,7 @@ function placechess([x, y]: NumberPair, piece: number) {
   getCell([x, y]).piece = piece;
   calcPower([x, y]);
   latestPlacement.value = [x, y];
+  checkDraw();
 
   stopTiming();
   if (gameStatus.value === 1) startTiming();
@@ -261,6 +280,13 @@ function getVictoryCount(player: number) {
   ).length;
 }
 
+// show if it's already the last game
+const isLastGame = computed(() =>
+  [1, 2]
+    .map((player) => getVictoryCount(player))
+    .every((v) => v === VICTORY_GAME_COUNT - 1)
+);
+
 // selection
 const selectedCell = ref<NumberPair | null>(null);
 watch(selectedCell, (newVal, oldVal) => {
@@ -331,6 +357,25 @@ function nextGame() {
   paused.value = false;
 }
 
+// end game
+const isGameEnd = computed(() => {
+  return (
+    (suddenDeath.value &&
+      [1, 2].map((player) => getVictoryCount(player)).some((v) => v >= 1)) ||
+    [1, 2]
+      .map((player) => getVictoryCount(player))
+      .some((v) => v >= VICTORY_GAME_COUNT)
+  );
+});
+
+const endGameModal = ref(isGameEnd.value);
+watch(isGameEnd, (v) => {
+  if (v) {
+    suddenDeathModal.value = false;
+    endGameModal.value = true;
+  }
+});
+
 // load from localstorage
 try {
   const remainingTimeJSON = localStorage.getItem("remainingTime");
@@ -392,32 +437,30 @@ try {
     />
 
     <player-panel
-      :time="playerRemainingTime[2]"
-      :piece="getPieceFromPlayer(2, gameCount)"
-      :game-count="gameCount"
-      :invert="true"
-      :game-status="gameStatus"
-      :active-piece="activePiece"
-      :victory-piece="victory"
-      :victory-count="getVictoryCount(2)"
-      :ready="playerReady[2]"
-      :selection="selectedCell"
-      @ready="onReady(2, !playerReady[2])"
-      @confirmselection="onConfirmSelect"
-    />
-    <player-panel
-      :time="playerRemainingTime[1]"
+      v-for="player in 2"
+      :time="playerRemainingTime[player]"
       :game-count="gameCount"
       :game-status="gameStatus"
+      :invert="player === 2"
       :active-piece="activePiece"
-      :piece="getPieceFromPlayer(1, gameCount)"
+      :piece="getPieceFromPlayer(player, gameCount)"
       :victory-piece="victory"
-      :victory-count="getVictoryCount(1)"
-      :ready="playerReady[1]"
+      :victory-count="getVictoryCount(player)"
+      :ready="playerReady[player]"
       :selection="selectedCell"
-      @ready="onReady(1, !playerReady[1])"
+      @ready="onReady(player, !playerReady[player])"
       @confirmselection="onConfirmSelect"
+      :sudden-death="suddenDeath || isLastGame"
+      :allow-next-game="!isGameEnd"
     />
+
+    <the-modal :open="suddenDeathModal" @confirm="suddenDeathModal = false">
+      由於出現和局, 下一局的對局將會直接決定最終勝負.
+    </the-modal>
+
+    <the-modal :open="endGameModal" @confirm="endGameModal = false">
+      對戰結束. 請通知工作人員記錄賽果.
+    </the-modal>
   </div>
 </template>
 
