@@ -1,4 +1,4 @@
-const version = "v3";
+const version = "v3-1";
 const cacheName = `lhsu-gomoku-${version}`;
 
 const filesToCache = ["./", "./index.html", "./manifest.json"];
@@ -23,8 +23,17 @@ self.addEventListener("activate", (e) => {
   );
 });
 
-self.addEventListener("fetch", function (e) {
+self.addEventListener("fetch", (e) => {
   e.respondWith(
-    caches.match(e.request).then((response) => response || fetch(e.request))
+    caches.open(cacheName).then((cache) =>
+      cache.match(e.request).then(
+        (response) =>
+          response ||
+          fetch(e.request).then((res) => {
+            cache.put(e.request, res.clone());
+            return res;
+          })
+      )
+    )
   );
 });
