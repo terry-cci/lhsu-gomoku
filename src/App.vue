@@ -359,13 +359,16 @@ function nextGame() {
 
 // end game
 const isGameEnd = computed(() => {
-  return (
-    (suddenDeath.value &&
-      [1, 2].map((player) => getVictoryCount(player)).some((v) => v >= 1)) ||
-    [1, 2]
-      .map((player) => getVictoryCount(player))
-      .some((v) => v >= VICTORY_GAME_COUNT)
-  );
+  if (suddenDeath.value) {
+    if (Math.abs(getVictoryCount(1) - getVictoryCount(2)) >= 1) return true;
+    if (placementHistory.value[3]?.victoryPiece === 3) return true;
+
+    return false;
+  }
+
+  return [1, 2]
+    .map((player) => getVictoryCount(player))
+    .some((v) => v >= VICTORY_GAME_COUNT);
 });
 
 const endGameModal = ref(isGameEnd.value);
