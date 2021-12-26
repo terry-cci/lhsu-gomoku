@@ -360,8 +360,15 @@ function nextGame() {
 // end game
 const isGameEnd = computed(() => {
   if (suddenDeath.value) {
-    if (Math.abs(getVictoryCount(1) - getVictoryCount(2)) >= 1) return true;
-    if (placementHistory.value[3]?.victoryPiece === 3) return true;
+    const drawGameIdx = placementHistory.value.findIndex(
+      (game) => game.victoryPiece === 3
+    );
+
+    if (
+      placementHistory.value[drawGameIdx + 1] &&
+      placementHistory.value[drawGameIdx + 1].victoryPiece !== 0
+    )
+      return true;
 
     return false;
   }

@@ -1,4 +1,4 @@
-const version = "v3-1";
+const version = "v3-2";
 const cacheName = `lhsu-gomoku-${version}`;
 
 const filesToCache = ["./", "./index.html", "./manifest.json"];
