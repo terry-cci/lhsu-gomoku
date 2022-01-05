@@ -26,7 +26,7 @@ const DIRECTIONS = [
   { dPos: [0, 1], powerIdx: 1 },
   { dPos: [1, 1], powerIdx: 0 },
 ];
-export const TOTAL_TIME = 420;
+export const TOTAL_TIME = 300;
 
 export function genDefaultCellInfo() {
   const info: CellInfo[][] = [];
